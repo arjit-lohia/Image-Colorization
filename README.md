@@ -18,7 +18,7 @@ A simple diffusion-based colorization approach trained on the CelebA dataset.
 
 ![Denoising](https://github.com/ErwannMillon/Color-diffusion/blob/main/visualization/train/total1.gif)
 
-![Colorization Example](IMAGES/DDPM_output.png)
+![Colorization Example](images/DDPM_output.png)
 
 ---
 
