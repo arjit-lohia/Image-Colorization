@@ -9,7 +9,7 @@ This repository showcases four different methods for colorizing black and white 
 A simple diffusion-based colorization approach trained on the CelebA dataset.
 
 - Works in LAB color space.
-  ![LAB Color Space](IMAGES/lab_color_space.png)
+  ![LAB Color Space](images/lab_color_space.png)
 - Greyscale "L" channel is given to the model as input.
 - UNet predicts noise on AB channels during training.
 - Conditional encoder extracts intermediate features from the L channel.
@@ -30,7 +30,7 @@ A ControlNet-based image colorization model trained on grayscale COCO images usi
 - Requires grayscale-color pairs and prompts in JSON format.
 - Supports training, inference, and downloading pretrained weights.
 
-![Colorization Example](IMAGES/SD_output.png)
+![Colorization Example](images/SD_output.png)
 
 [ControlNet Repo](https://github.com/lllyasviel/ControlNet)
 
@@ -45,9 +45,9 @@ Transformer-based colorization that tackles undersaturation and semantic ambigui
 - Trained and tested on ImageNet.
 - Distributed training supported.
 
-![Colorization Example](IMAGES/CT2.png)
+![Colorization Example](images/CT2.png)
 
-[Citation Paper](https://ci.idm.pku.edu.cn/Weng_ECCV22b.pdf)
+[Citation Paper](https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136670001.pdf)
 
 ---
 
