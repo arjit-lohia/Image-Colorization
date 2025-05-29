@@ -1,0 +1,182 @@
+Pytorch Lightning - pytorch based python frameword for training models (lightweight) : simplified pytorch training
+
+--------------- ColorDiffusion class (model.py) ------------------------------
+
+U-Net for denoising, an encoder for extracting grayscale features, and a Gaussian Diffusion process for progressively adding/removing noise to/from the color channels.
+
+EMA (exponential moving average) - applies more weight to the most recent data points than those which happened in past
+
+
+
+
+--------------------------------------------------------------------------------------
+
+----------------- Encoder & Unet (denoising.py) --------------------------
+
+UNET ARCHITECTURE :
+
+=====================================================================================
+Layer (type:depth-idx)                                       Param #
+=====================================================================================
+Unet                                                         --
+├─Conv2d: 1-1                                                18,944
+├─Sequential: 1-2                                            --
+│    └─SinusoidalPosEmb: 2-1                                 --
+│    └─Linear: 2-2                                           66,048
+│    └─GELU: 2-3                                             --
+│    └─Linear: 2-4                                           262,656
+├─ModuleList: 1-3                                            --
+│    └─ModuleList: 2-5                                       --
+│    │    └─ResnetBlock: 3-1                                 427,008
+│    │    └─ResnetBlock: 3-2                                 427,008
+│    │    └─Residual: 3-3                                    65,920
+│    │    └─Sequential: 3-4                                  131,200
+│    └─ModuleList: 2-6                                       --
+│    │    └─ResnetBlock: 3-5                                 427,008
+│    │    └─ResnetBlock: 3-6                                 427,008
+│    │    └─Residual: 3-7                                    65,920
+│    │    └─Sequential: 3-8                                  262,400
+│    └─ModuleList: 2-7                                       --
+│    │    └─ResnetBlock: 3-9                                 1,443,840
+│    │    └─ResnetBlock: 3-10                                1,443,840
+│    │    └─Residual: 3-11                                   131,840
+│    │    └─Sequential: 3-12                                 786,816
+│    └─ModuleList: 2-8                                       --
+│    │    └─ResnetBlock: 3-13                                3,050,496
+│    │    └─ResnetBlock: 3-14                                3,050,496
+│    │    └─Residual: 3-15                                   197,760
+│    │    └─Conv2d: 3-16                                     2,654,592
+├─ModuleList: 1-4                                            --
+│    └─ModuleList: 2-9                                       --
+│    │    └─ResnetBlock: 3-17                                4,672,896
+│    │    └─ResnetBlock: 3-18                                4,672,896
+│    │    └─Residual: 3-19                                   197,760
+│    │    └─Sequential: 3-20                                 1,327,488
+│    └─ModuleList: 2-10                                      --
+│    │    └─ResnetBlock: 3-21                                4,181,376
+│    │    └─ResnetBlock: 3-22                                4,181,376
+│    │    └─Residual: 3-23                                   197,760
+│    │    └─Sequential: 3-24                                 884,992
+│    └─ModuleList: 2-11                                      --
+│    │    └─ResnetBlock: 3-25                                1,837,312
+│    │    └─ResnetBlock: 3-26                                1,837,312
+│    │    └─Residual: 3-27                                   131,840
+│    │    └─Sequential: 3-28                                 295,040
+│    └─ModuleList: 2-12                                      --
+│    │    └─ResnetBlock: 3-29                                607,360
+│    │    └─ResnetBlock: 3-30                                607,360
+│    │    └─Residual: 3-31                                   65,920
+│    │    └─Conv2d: 3-32                                     147,584
+├─ResnetBlock: 1-5                                           --
+│    └─Sequential: 2-13                                      --
+│    │    └─SiLU: 3-33                                       --
+│    │    └─Linear: 3-34                                     393,984
+│    └─Block: 2-14                                           --
+│    │    └─WeightStandardizedConv2d: 3-35                   1,327,488
+│    │    └─GroupNorm: 3-36                                  768
+│    │    └─SiLU: 3-37                                       --
+│    └─Block: 2-15                                           --
+│    │    └─WeightStandardizedConv2d: 3-38                   1,327,488
+│    │    └─GroupNorm: 3-39                                  768
+│    │    └─SiLU: 3-40                                       --
+│    └─Identity: 2-16                                        --
+├─Residual: 1-6                                              --
+│    └─PreNorm: 2-17                                         --
+│    │    └─Attention: 3-41                                  196,992
+│    │    └─LayerNorm: 3-42                                  384
+├─ResnetBlock: 1-7                                           --
+│    └─Sequential: 2-18                                      --
+│    │    └─SiLU: 3-43                                       --
+│    │    └─Linear: 3-44                                     393,984
+│    └─Block: 2-19                                           --
+│    │    └─WeightStandardizedConv2d: 3-45                   1,327,488
+│    │    └─GroupNorm: 3-46                                  768
+│    │    └─SiLU: 3-47                                       --
+│    └─Block: 2-20                                           --
+│    │    └─WeightStandardizedConv2d: 3-48                   1,327,488
+│    │    └─GroupNorm: 3-49                                  768
+│    │    └─SiLU: 3-50                                       --
+│    └─Identity: 2-21                                        --
+├─ResnetBlock: 1-8                                           --
+│    └─Sequential: 2-22                                      --
+│    │    └─SiLU: 3-51                                       --
+│    │    └─Linear: 3-52                                     131,328
+│    └─Block: 2-23                                           --
+│    │    └─WeightStandardizedConv2d: 3-53                   295,040
+│    │    └─GroupNorm: 3-54                                  256
+│    │    └─SiLU: 3-55                                       --
+│    └─Block: 2-24                                           --
+│    │    └─WeightStandardizedConv2d: 3-56                   147,584
+│    │    └─GroupNorm: 3-57                                  256
+│    │    └─SiLU: 3-58                                       --
+│    └─Conv2d: 2-25                                          32,896
+├─Conv2d: 1-9                                                258
+=====================================================================================
+Total params: 48,093,058
+Trainable params: 48,093,058
+Non-trainable params: 0
+=====================================================================================
+
+
+ENCODER :
+
+=====================================================================================
+Layer (type:depth-idx)                                       Param #
+=====================================================================================
+Encoder                                                      --
+├─Conv2d: 1-1                                                6,400
+├─Sequential: 1-2                                            --
+│    └─SinusoidalPosEmb: 2-1                                 --
+│    └─Linear: 2-2                                           66,048
+│    └─GELU: 2-3                                             --
+│    └─Linear: 2-4                                           262,656
+├─ModuleList: 1-3                                            --
+│    └─ModuleList: 2-5                                       --
+│    │    └─ResnetBlock: 3-1                                 427,008
+│    │    └─ResnetBlock: 3-2                                 427,008
+│    │    └─Residual: 3-3                                    65,920
+│    │    └─Sequential: 3-4                                  65,664
+│    └─ModuleList: 2-6                                       --
+│    │    └─ResnetBlock: 3-5                                 427,008
+│    │    └─ResnetBlock: 3-6                                 427,008
+│    │    └─Residual: 3-7                                    65,920
+│    │    └─Sequential: 3-8                                  131,328
+│    └─ModuleList: 2-7                                       --
+│    │    └─ResnetBlock: 3-9                                 1,443,840
+│    │    └─ResnetBlock: 3-10                                1,443,840
+│    │    └─Residual: 3-11                                   131,840
+│    │    └─Sequential: 3-12                                 393,600
+│    └─ModuleList: 2-8                                       --
+│    │    └─ResnetBlock: 3-13                                3,050,496
+│    │    └─ResnetBlock: 3-14                                3,050,496
+│    │    └─Residual: 3-15                                   197,760
+│    │    └─Conv2d: 3-16                                     1,327,488
+├─ModuleList: 1-4                                            --
+=====================================================================================
+Total params: 13,411,328
+Trainable params: 13,411,328
+Non-trainable params: 0
+=====================================================================================
+
+
+-------------------------------------------------------------------------------------------
+
+DURING TRAINING :
+
+  | Name      | Type              | Params | Mode 
+--------------------------------------------------------
+0 | unet      | Unet              | 48.1 M | train
+1 | encoder   | Encoder           | 13.4 M | train
+2 | diffusion | GaussianDiffusion | 0      | train
+--------------------------------------------------------
+61.5 M    Trainable params
+0         Non-trainable params
+61.5 M    Total params
+246.018   Total estimated model params size (MB)
+524       Modules in train mode
+0         Modules in eval mode
+
+
+---------------------------------------------------------------------------------------
+
+colorizationDataset (dataset.py)

@@ -1,0 +1,12 @@
+numpy
+torch
+Pillow
+einops
+torchvision
+pytorch-lightning==1.5.10
+transformers
+setuptools
+open-clip-torch
+wandb
+opencv-python
+scikit-image
